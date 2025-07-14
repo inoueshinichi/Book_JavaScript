@@ -49,7 +49,7 @@
   <body>
     <!-- Main -->
     <main class="main">
-        <div class="container">
+        <div class="container" id="root_main">
             <section id="html" class="note">
             <h1>HTML</h1>
             <p><strong>HTML</strong>は文書のコンテンツと構造を表現します。</p>
@@ -134,9 +134,216 @@
         // HTMLBodyElemnetなど
 
         // Node: DOMツリーの各オブジェクトの継承元. 最も重要
+        /*
+        Node --- Document - HTMLDocument
+              |- DocumentType
+              |- Text
+              |- Element
+                    |- HTMLElement
+                           |- HTMLHeadElement
+                           |- HTMLBodyElement
+                           |- HTMLInputElement
+                            .....
+        */
+
+        /*
+            Nodeオブジェクトのプロパティ
+            getRootNode()
+            parentNode
+            parentElement
+            childNodes
+            firstChild
+            lastChild
+            previousSibling
+            nextSibling
+
+            Elementオブジェクトのプロパティ
+            children
+            firstElementChild
+            lastElementChild
+            previousElementSibling
+            nextElementSibling
+        */
+        console.log("document.body.getRootNode()", document.body.getRootNode())
+        console.log("document.body.childNodes", document.body.childNodes) // NodeList
+        console.log("document.body.children", document.body.children) // HTMLCollection
+        
+        // HTMLCollectionはid属性に直接アクセスするプロパティを持つ
+        console.log("document.getElementById('root_main').children.html", document.getElementById('root_main').children.html)
+        console.log("document.getElementById('root_main').children.css", document.getElementById('root_main').children.css)
+
+        // NodeListとHTMLCollectionは配列風オブジェクト.
+
+        console.log("document.body.firstChild", document.body.firstChild)
+        console.log("document.body.firstElementChild", document.body.firstElementChild)
+
+        console.log("document.getElementById('root_main').children.css.previousSibling", 
+            document.getElementById('root_main').children.css.previousSibling)
+        console.log("document.getElementById('root_main').children.css.previousElementSibling", 
+            document.getElementById('root_main').children.css.previusElementSibling)
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        /* 要素を探索する手段
+            getElementsByTagName()
+            getElementById()
+            getElementsByClassName()
+            querySelector()
+            querySelectorAll()
+        */
+       console.log('--- 要素を探索する手段 ---')
+       console.log(document.getElementsByTagName("strong"))
+       console.log(document.getElementById('root_main').children.css.getElementsByTagName('strong'))
+       console.log(document.getElementById('js'))
+       console.log(document.getElementsByClassName('note'))
+
+       console.log(document.querySelector("meta[charset=UTF-8]"))
+       console.log(document.querySelectorAll(".note h1"))
+       console.log(document.querySelectorAll(".note p"))
+
+       /*
+        要素の情報を調べる
+        nodeType: Document, Node, Text, HTML***Elementなど型チェック
+        ELEMENT_NODE: 1
+        TEXT_NODE: 3
+        COMMENT_NODE: 8
+        DOCUMENT_NODE: 9
+        DOCUMENT_TYPE_NODE: 10
+        */ 
+       console.log("--- 要素の情報を調べる ---")
+       console.log(document.nodeType)
+       console.log("document.nodeType === Node.DOCUMENT_NODE", document.nodeType === Node.DOCUMENT_NODE)
+       console.log(document.body.nodeType)
+       console.log("document.body.nodeType === Node.ELEMENT_NODE", document.body.nodeType === Node.ELEMENT_NODE)
+
+       // HTMLタグの場合のタグ名の確認(Node系とElement系の2種類の確認方法がある)
+       console.log("document.nodeName", document.nodeName) // Node系 for Node.   -> #{object}
+       console.log("document.tagName", document.tagName)   // Element系 for Node -> undefined
+       console.log("document.body.nodeName", document.body.nodeName)
+       console.log("document.body.tagName", document.body.tagName)
+
+        /**要素の属性を操作する
+         * idとclass(className)はElementオブジェクトが特別扱いでJavaScriptのオブジェクトからプロパティとして直接指定できる。
+         * 上記以外は, attributesとgetAttributeNames()を使う
+         */
+        const js = document.getElementById("js")
+        console.log("js.id", js.id) // js
+        js.id = "javascript" // 属性の変更
+        console.log("js", js)
+        console.log("document.getElementById('js')", document.getElementById('js'))
+        console.log("document.getElementById('javascript')", document.getElementById('javascript'))
+
+        console.log("document.getElementById('root_main').children.css.className", 
+            document.getElementById('root_main').children.css.className)
+
+        // classNameに新規class名を追加
+        const css = document.getElementById('root_main').children.css
+        css.className += " stylesheet"
+        console.log('css', css)
+        console.log(css.className.split(" "))
+        console.log(css.className.split(' ').includes('stylesheet'))
+
+        // 複数class名を配列風オブジェクトとして取得できるclassList
+        console.log("css.classList", css.classList) // DOMTokenList
+        css.classList.add("css")
+        console.log(css.classList)
+
+        console.log("--- idとclass(className)以外の属性へのアクセス&操作 ---")
+        console.log("document.head.firstElementChild", document.head.firstElementChild)
+        console.log("document.head.firstElementChild.attributes", document.head.firstElementChild.attributes) // NamedNodeMap
+
+        // Attrオブジェクト
+        console.log("document.head.firstElementChild.attributes[0]", document.head.firstElementChild.attributes[0])
+        const charset = document.head.firstElementChild.attributes[0]
+        console.log("charset", charset)
+        console.log("charset.name", charset.name) // Attr.name
+        console.log("charset.value", charset.value) // Attr.value
+        console.log("document.head.firstElementChild.getAttributeNames()", document.head.firstElementChild.getAttributeNames())
+
+        // hasAttribute()
+        // getAttribute()
+        // setAttribute()
+        // removeAttribute()
+        const meta = document.head.firstElementChild
+        console.log("meta", meta)
+        console.log("meta.hasAttribute('charset')", meta.hasAttribute('charset'))
+        console.log("meta.getAttribute('charset')", meta.getAttribute('charset'))
+        console.log("meta.setAttribute('charset', 'utf8')", meta.setAttribute('charset', 'utf8'))
+        console.log(meta)
+        // console.log("meta.removeAttribute('charset')", meta.removeAttribute('charset'))
+        // console.log(meta)
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        /**要素のコンテンツを操作する
+         * textContent : 全てのテキストを返す
+         * innerText   : 実際に表示されているテキストだけ表示(タグ名含めて) 
+         * removeChild({node}) : 子ノードの削除
+         * createElement("{tag}") : HTMLElementの作成
+         * createTextNode("{text}") : テキストNodeの作成
+         * appendChild() : 子ノードリストの最後にノードを一つ追加
+         * insertBefore() : 基準ノードと新ノードを引数に取り、子ノードリストの基準ノードの前にノードを一つ追加
+         * prepend() : 子ノードリストの最初に任意個数のノードを追加
+         * apppend() : 子ノードリストの最後に任意個数のノードを追加
+         * replaceChild() : 要素を入れ替える
+         */
+        document.querySelector("strong").style.display = "none"
+        const htmlNote = document.querySelector("p")
+        console.log("htmlNote.textContent", htmlNote.textContent)
+        console.log("htmlNote.innerText", htmlNote.innerHTML)
+
+        // 要素の書き換え
+        htmlNote.textContent = "HTMLは文書のコンテンツと構造を表現します。"
+        console.log("htmlNote", htmlNote)
+
+        // 要素を削除
+        const node = document.getElementById('root_main').firstElementChild
+        console.log("node", node)
+        console.log("node.parentNode.removeChild(node)", node.parentNode.removeChild(node))
+
+        // 要素/ノードの作成
+        const divElem = document.createElement('div')
+        const textNode = document.createTextNode('HTML')
+        console.log('divElem', divElem)
+        console.log('textNode', textNode)
+
+        // 要素を追加
+        let root = document.getElementById('root_main')
+        root.insertBefore(document.createTextNode('insertBefore(js)'), root.children.js)
+        root.appendChild(document.createElement('br'))
+        root.appendChild(document.createTextNode("appendChild"))
+        root.append(document.createElement('hr'), "append")
+        root.prepend("prepend", document.createElement('hr'))
+
+        let fragment = new DocumentFragment() // reflowによる描画パフォーマンスを防ぐために複数要素を一括で描画する
+        fragment.appendChild(document.createTextNode('Tiny Tank'))
+        fragment.appendChild(document.createElement('hr'))
+        fragment.appendChild(document.createTextNode('SSB88'))
+        root.appendChild(fragment)
+
+
+        // 要素を入れ替える(インタラクション)
+        let fragmentForCSS = new DocumentFragment()
+        fragmentForCSS.appendChild(document.createElement('hr'))
+        fragmentForCSS.appendChild(document.createTextNode("CSSセクションは入れ替えられました."))
+        fragmentForCSS.appendChild(document.createElement('hr'))
+        root.replaceChild(fragmentForCSS, root.children.css)
+
+        // contentEditable属性 (ユーザーがGUIを使って既存要素を制御する)
+        // document.body.contentEditable = true
+
+        // designMode属性 for documentオブジェクト
+        // HTML文書全体が編集可能になる
+        // document.execCommand()メソッドを使って自由にHTML文章を操作できる
+        // document.designMode = true
+
         
 
-
     </script>
+
   </body>
 </html>
