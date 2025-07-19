@@ -340,9 +340,162 @@
         // HTML文書全体が編集可能になる
         // document.execCommand()メソッドを使って自由にHTML文章を操作できる
         // document.designMode = true
+    </script>
 
-        
+    <script type="module" defer>
+        'use strict'
 
+        /* CSSオブジェクトモデル(CSSOM)
+        DOMのCSS版: つまりCSSの内部表現
+        CSSOMで<style>タグで指定したCSSそのもにアクセス可能
+        <style>
+            h1 {
+                background: black;
+                color: white;
+                margin: 10px;
+                padding: 10px;
+            }
+            p {
+                border: 1px solid gray;
+                margin: 10px;
+                padding: 5px;
+            }
+            strong {
+                color: red;
+                font-size: 1.5rem;
+            }
+        </style>
+        */
+
+        /* document.styleSheet 
+            CSSStyleSheet: 一つの<style>タグが保持いているCSSを指す. cssRulesプロパティとして複数のCSSRuleオブジェクトを保持する.
+            CSSRule: CSSのルール. styleルール + importルール, mediaルール.
+            CSSStyleRule: CSSのスタイルルールを表す.
+            CSSMediaRule: 
+            CSSImportRule:
+            CSSKeyframesRule: 
+            CSSStyleDeclaration: CSS宣言を表す.
+        */
+        console.log("document.styleSheets[0].cssRules", document.styleSheets[0].cssRules) // CSSRuleList
+
+        console.log("document.styleSheets[0].cssRules[0]", document.styleSheets[0].cssRules[0])
+
+        console.log("document.styleSheets[0].cssRules[0].selectorText", document.styleSheets[0].cssRules[0].selectorText)
+
+        console.log("document.styleSheets[0].cssRules[0].style", document.styleSheets[0].cssRules[0].style)
+
+        // CSSStyleDeclarationオブジェクトはインデックスでCSSプロパティに名にアクセスできるだけでなく
+        // CSSプロパティ名でその値にもアクセスできる.
+        for (let rule of document.styleSheets[1].cssRules) {
+            const selector = rule.selectorText
+            for (let prop of rule.style) {
+                console.log(`${selector}: { ${prop}: ${rule.style[prop]} }`)
+            }
+        }
+
+        /* CSSルールを書き換える */
+
+        // setPropertyとremovePropertyでCSSStyleDeclarationを編集できる
+        let h1Style = document.styleSheets[1].cssRules[0].style
+        console.log('h1Style', h1Style)
+        h1Style.fontSize = '50%'
+        console.log('h1Style["font-size"]', h1Style["font-size"])
+        h1Style.setProperty("font-size", "300%", "important")
+        console.log('h1Style["font-size"]', h1Style["font-size"])
+        h1Style.removeProperty("font-size")
+        console.log('h1Style["font-size"]', h1Style["font-size"])
+
+        // CSSStyleRuleオブジェクトを適用するセレクタを変更できる
+        document.styleSheets[1].cssRules[0].selectorText = '.note'
+
+
+        /* 新しいCSSルールを追加する */
+        document.styleSheets[1].insertRule(`
+            .note {
+              margin: 4px;
+              border: 1px solid black;
+              background-color: lightYellow;
+            }
+        `/*, 2*/)
+
+        /* インデックス指定でCSSルールを削除 */
+        // document.styleSheets[0].deleteRule(0)
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        document.body.addEventListener('click', e => {
+            e.target.style.backgroundColor = `#${Math.floor(Math.random() * 0xffffff).toString(16)}`
+        })
+
+        document.body.addEventListener("click", () => console.log('最初のイベントハンドラ'))
+        const secondHandler = () => console.log("二つ目のイベントハンドラ")
+        document.body.addEventListener("click", secondHandler)
+        document.body.dispatchEvent(new Event("click"))
+        document.body.removeEventListener("click", secondHandler)
+
+        /* キーボードイベント
+            KeybordEvent
+            1) key
+            2) code
+            3) altKey
+            4) ctrlKey
+            5) metaKey
+            6) shiftKey
+         */
+        let keyLogger = e => console.log(`
+        type: ${e.type} 
+        code: ${e.code} 
+        key: ${e.key} 
+        shift: ${e.shiftKey}
+        `)
+        document.addEventListener("keydown", keyLogger)
+        document.addEventListener("keyup", keyLogger)
+
+        /* マウスイベント 
+            MouseEvent
+            1) clientX
+            2) clientY
+            3) altKey
+            4) ctrlKey
+            5) metaKey
+            6) shiftKey
+        */
+       let clicking = false
+       document.addEventListener("mousedown", () => clicking = true)
+       document.addEventListener("mouseup", () => clicking = false)
+       document.addEventListener("mousemove", e => {
+        if (!clicking) return
+        console.log(`
+            clientX: ${e.clientX}
+            clientY: ${e.clientY}
+            shiftKey: ${e.shiftKey}
+        `)
+       })
+
+       /* 自作イベント */
+       let callEvent = new CustomEvent("call", {detail: "もしもし私メリーさん"})
+       document.addEventListener("call", e => console.log(e.detail))
+       document.dispatchEvent(callEvent)
+
+       /* イベントハンドラの探索順序
+        前提: ある要素でイベントが発火すると、その祖先要素に登録したイベントハンドラも合わせて実行される.
+        キャプチャフェーズ -> イベント発火DOM発見 -> バブリングフェーズ
+       */
+      window.addEventListener("click", e => console.log(`Ph.${e.eventPhase} bubble window`))
+      window.addEventListener("click", e => console.log(`Ph.${e.eventPhase} capture window`), true)
+      document.addEventListener("click", e => console.log(`Ph.${e.eventPhase} bubble document`))
+      document.addEventListener("click", e => console.log(`Ph.${e.eventPhase} capture document`), true)
+      document.body.addEventListener("click", e => console.log(`Ph.${e.eventPhase} bubble body`))
+      document.body.addEventListener("click", e => console.log(`Ph.${e.eventPhase} capture body`), true)
+
+      /* イベントの伝播を止める
+       止めたい要素のaddEventListner(capture or bubble)でe.stopPropagation()を実行
+       */
+      window.addEventListener("click", e => e.stopPropagation(), true) // 同一フェーズでは追加した順にイベントハンドラが実行される.
+
+      
     </script>
 
   </body>
