@@ -495,7 +495,27 @@
        */
       window.addEventListener("click", e => e.stopPropagation(), true) // 同一フェーズでは追加した順にイベントハンドラが実行される.
 
-      
+    </script>
+
+
+    <script type="module" defer>
+        'use strict'
+
+        /* Web Components
+            カスタマイズDOMの作成仕様
+            1) Costom Elements: カスタム要素を作成するためのAPI
+            2) Shadow DOM: スクリプトやスタイルの適用範囲を決めるShadow DOMの管理用API
+            3) HTML Template: 画面に描画されない<template>要素と<slot>要素.
+        */
+        
+        class InfoPanel extends HTMLElement {
+            constructor() {
+                super()
+            }
+        }
+
+        
+
     </script>
 
   </body>

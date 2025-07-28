@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- 文字セット -->
+  <meta charset="UTF-8">
+
+  <!-- レイアウト -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Webページの説明 -->
+  <title>Web</title>
+  <meta name="description" content="Webページの説明">
+  <meta name="keywords" content="キーワード">
+
+  <!-- OGP設定 -->
+  <meta property="og:local" content="ja_JP" />
+  <meta property="og:type" content="ウェブサイト名" />
+  <meta property="og:title" content="" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="" />
+  <meta property="og:site_name" content="" />
+  <meta property="og:image" content="" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <header>
+        <nav>Ch13ネットワーク</nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <p>テスト</p>
+        </div>
+    </main>
+
+    <footer>
+        <nav>Ch13ネットワーク</nav>
+    </footer>
+
+    <script type="module" defer>
+        'use strict'
+
+        const url = new URL("https://www.amazon.co.jp/s?k=javascript&ref=nav_bb_sb")
+        console.log(url)
+        console.log(url.protocol)
+        console.log(url.host)
+        console.log(url.pathname)
+        console.log(url.search)
+        console.log(url.searchParams.get("k"))
+
+        // 不正なURLでは例外発生
+        try {
+            new URL("不正なURL")
+        } catch (err) {
+            console.error(err)
+        }
+
+        // メール
+        const mail = new URL("mailto:inoue@ataraxiadx.com")
+        console.log(mail)
+
+        /** URL文字列の制限
+         * %エンコード
+         * 
+         * encodeURI() : URI全体をエンコードする
+         * decodeURI() : 
+         * encodeURIComponent() : クエリパラメータをエンコードする
+         * decodeURIComponent() :
+         */
+        console.log(encodeURI("http://日本語.jp")) // URIとして使える
+        console.log(encodeURIComponent("http://日本語.jp")) // クエリパラメータとして使える
+
+        /** レスポンスを確認する
+         * Responseオブジェクトのメソッド
+         * arrayBuffer() : レスポンスボディをArrayBufferに解決するPromiseを返す
+         * blob() : 
+         * formData() : 
+         * json() : 
+         * text() : 
+         */
+        fetch("https://jsonplaceholder.typicode.com")
+            .then(response => response.text())
+            .then(text => console.log(text))
+
+        fetch("https://jsonplaceholder.typicode.com")
+            .then(response => console.log(new Map(response.headers)))
+
+        fetch("https://jsonplaceholder.typicode.com/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: '{ "title": "Humpty Dumpty", "body": "Humpty Dumpty sat on a wall" }'
+        })
+        .then(response => response.json())
+        .then(json => console.log(json))
+
+        let request = new Request("https://jsonplaceholder.typicode.com/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: '{ "title": "Humpty Dumpty", "body": "Humpty Dumpty sat on a wall" }'
+        })
+
+        fetch(request)
+            .then(response => response.json())
+            .then(json => console.log(json))
+
+        fetch("https://jsonplaceholder.typicode.com/NotExist")
+            .then(response => console.log(response))
+        
+        fetch("https://jsonplaceholder.typicode.com/NotExist")
+            .then(response => {
+                if (!response.ok) throw new Error(response.statusText)
+                // なんらかの処理
+            })
+            .catch(err => console.log(err))
+    </script>
+
+
+</body>
