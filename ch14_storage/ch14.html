@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- 文字セット -->
+  <meta charset="UTF-8">
+
+  <!-- レイアウト -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Webページの説明 -->
+  <title>Web</title>
+  <meta name="description" content="Webページの説明">
+  <meta name="keywords" content="キーワード">
+
+  <!-- OGP設定 -->
+  <meta property="og:local" content="ja_JP" />
+  <meta property="og:type" content="ウェブサイト名" />
+  <meta property="og:title" content="" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="" />
+  <meta property="og:site_name" content="" />
+  <meta property="og:image" content="" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <header>
+        <nav>Ch14ストレージ</nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <p>テスト</p>
+        </div>
+    </main>
+
+    <footer>
+        <nav>Ch14ストレージ</nav>
+    </footer>
+
+    <script type="module" defer>
+        'use strict'
+        
+        console.log("document.cookie", document.cookie)
+
+        let cookieMap = () => new Map(document.cookie.split(/;\s*/).map(kv => {
+            const ms = kv.match(/([^=]+)=(.*)/)
+            return [ms[1], ms[2].replace(/^"|"/g, "")]
+        }))
+
+        const cookies = cookieMap()
+        console.log("cookies", cookies)
+        console.log(cookies.get("lang"))
+
+        document.cookie = "power=E"
+        console.log(document.cookie)
+        console.log("power=", cookieMap().get("power"))
+
+        document.cookie = "power=C"
+        console.log(document.cookie)
+        console.log("power=", cookieMap().get("power"))
+
+        // Cookieに属性を設定する
+        // HttpOnly属性
+        // max-age属性. : 寿命を秒単位で指定
+        // path属性.    : 使用する絶対パス
+        // domain属性.  : 使用するドメイン
+        // expires属性  : 有効期限
+        // samesite属性 : strict or lax
+
+        document.cookie = "power=B;max-age=10"
+        console.log(document.cookie)
+
+        document.cookie = "power=D;max-age=1000"
+        console.log(document.cookie)
+        console.log(cookieMap().get("power"))
+
+        document.cookie = "power=D;max-age=10"
+        console.log(document.cookie)
+        console.log("[10秒以内]power=", cookieMap().get("power"))
+        setTimeout(() => {
+            // 10秒後にチェック
+            console.log("[10秒後]power=", cookieMap().get("power"))
+        }, 10000)
+
+        document.cookie = "range=E;max-age=1000;path=/"
+        console.log(document.cookie)
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        let tmp = localStorage.getItem("存在しないキー")
+        console.log(tmp)
+
+        localStorage.setItem("power", "B")
+        tmp = localStorage.getItem("power")
+        console.log(tmp)
+
+        localStorage.setItem("The Fool", JSON.stringify({
+            power: "B",
+            speed: "C",
+            range: "D"
+        }))
+        tmp = localStorage.getItem("The Fool")
+        console.log(tmp)
+
+        // while (true) {
+        //     try {
+        //         const longItem = localStorage.getItem("long item")
+        //         localStorage.setItem("long item", `${longItem}${longItem}`)
+        //         console.log(localStorage.getItem("long item"))
+        //     } catch (err) {
+        //         console.log(err)
+        //         localStorage.removeItem("long item")
+        //         break
+        //     }
+        // }
+        console.log(localStorage.getItem("long item"))
+        console.log("Remove long item in localStorage")
+
+        localStorage.removeItem('The Fool')
+        console.log(localStorage.getItem("The Fool"))
+
+        // localStorage.clear()
+        // console.log(localStorage)
+
+        // Storageのキーを全て確認する
+        console.log(">>> Check localStorage key list")
+        for (let i = 0; i < localStorage.length; i++) {
+            console.log(localStorage.key(i))
+        }
+
+        /** StorageEventのプロパティ
+         * key: 変更されたデータのキー
+         * storageArea: 変更されたStorageオブジェクト自身. localStorage or sessionStorage
+         * url: 変更されたデータのURL
+         * oldValue: 変更前のデータの値
+         * newValue: 変更後のデータの値
+         */
+        // 2つ以上のタブ間でlocalStorageを同期させる
+        window.addEventListener("storage", e => {
+            console.log(e)
+            console.log("e.key", e.key)
+            console.log("e.storageArea", e.storageArea)
+            console.log("e.url", e.url)
+            console.log("e.oldValue", e.oldValue)
+            console.log("e.newValue", e.newValue)
+        })
+
+        sessionStorage.setItem("Tiny", "Tank")
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        /** IndexedDB
+         * オブジェクト指向DB (OODB)
+         * IDBDatabase : データベース
+         * IDBObjectStore : テーブル
+         * Object : レコード
+         * Property: カラム
+         * IDBIndex: インデックス
+         * IDBOpenDBRequest: 非同期処理のCB登録用オブジェクト
+         */
+        
+        // データベースに接続する
+        indexedDB.deleteDatabase("jojodb") // 毎回DBは消しておく
+        const promise = new Promise((resolve, reject) => {
+            try {
+                let openRequest = indexedDB.open("jojodb", 1)
+                openRequest.addEventListener("success", e => {
+                    console.log(`success: ${e.target.result}`) // result: IDBDatabase 注意: このインスタンスでIDBObjectStoreは生成できない
+                })
+                openRequest.addEventListener('error', e => {
+                    console.error(`error: ${e.target.errorCode}`)
+                })
+                openRequest.addEventListener("upgradeneeded", e => {
+                    const db = e.target.result // IDBDatabase
+                    console.log("db1", db)
+
+                    // storeとスキーマ作成
+                    const standStore = db.createObjectStore("stands", {
+                        keyPath: "id", autoIncrement: true
+                    })
+                    console.log(standStore)
+
+                    // インデックスの作成
+                    standStore.createIndex("nameIndex", "name", {unique: true})
+                    standStore.createIndex("powerIndex", "power")
+
+                    resolve(db)
+                })
+            } catch (err) {
+                reject(err)
+            }
+        })
+        
+        promise.then(db => {
+            // オブジェクトを追加する
+            console.log("db2", db)
+            let transaction = db.transaction("stands", "readwrite")
+            
+            transaction.addEventListener("complete", e => console.log("transaction complete"))
+            
+            let standStore = transaction.objectStore("stands")
+
+            let addRequest = standStore.add({name: "The Fool", power: "B", speed: "C", range: "D"})
+            
+            addRequest.addEventListener("success", e => console.log(`add success (Key:${e.target.result})`))
+        })
+        .catch(err => {
+            console.error(err)
+        })
+
+        
+    </script>
+
+</body>
