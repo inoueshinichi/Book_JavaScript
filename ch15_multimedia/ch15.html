@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- 文字セット -->
+  <meta charset="UTF-8">
+
+  <!-- レイアウト -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Webページの説明 -->
+  <title>Web</title>
+  <meta name="description" content="Webページの説明">
+  <meta name="keywords" content="キーワード">
+
+  <!-- OGP設定 -->
+  <meta property="og:local" content="ja_JP" />
+  <meta property="og:type" content="ウェブサイト名" />
+  <meta property="og:title" content="" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="" />
+  <meta property="og:site_name" content="" />
+  <meta property="og:image" content="" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <header>
+        <nav>Ch15マルチメディア(Header)</nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div>
+                <div>画像</div>
+                <img id="image" width="200" height="200" src="./JavaScript-logo.png">
+            </div>
+            <div>
+                <div>canvas1</div>
+                <canvas id="canvas1" width="200" height="200"></canvas>
+            </div>
+            <div>
+                <div>canvas2</div>
+                <canvas id="canvas2" width="200" height="200"></canvas>
+            </div>
+            <div>
+                <div>canvas3</div>
+                <canvas id="canvas3" width="200" height="200"></canvas>
+            </div>
+            <div>
+                <div>canvas4(DoubleBuffer)</div>
+                <canvas id="canvas4" width="200" height="200"></canvas>
+            </div>
+            <div>
+                <div>canvas5(WEBGL)</div>
+                <canvas id="canvas5" width="200" height="200"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <nav>Ch15マルチメディア(footer)</nav>
+    </footer>
+
+    <!-- <script type="module" defer>
+        document.body.innerHTML = `
+            <svg viewBox="0 0 1200 450" xmlns="http://www.w3.org/2000/svg">
+                <g fill="yellow" stroke="blue" stroke-width="5">
+                <ellipse transform="translate(180, 60)" rx="170" ry="50" />
+                <line x1="10" y1="200" x2="350" y2="250" />
+                <polygon transform="translate(150, -50)"
+                    points="350,75 379,161 469,161 397,215 423,301
+                            350,250 277,301 303,215 231,161 312,161" />
+                <polyline transform="translate(-30, 50)"
+                    points="50,375 150,375 150,325 250,325 250,375
+                            350,375 350,250 450,250 450,375" />
+                <path transform="translate(-100 70)"
+                    d="M600,350 l 50,-25
+                    a25,25 -30 0,1 50,-25 l 50,-25
+                    a25,50 -30 0,1 50,-25 l 50,-25
+                    a25,75 -30 0,1 50,-25 l 50,-25
+                    a25,100 -30 0,1 50,-25 l 50,-25" />
+                </g>
+                <g font-size="30">
+                <text x="130" y="70">ellipse</text>
+                <text x="150" y="200">line</text>
+                <text x="440" y="140">polygon</text>
+                <text x="120" y="350">polyline</text>
+                <text x="720" y="350">path</text>
+                </g>
+            </svg>`
+    </script> -->
+
+    <script type="module" defer>
+        /* Canvas */
+        const canvas1 = document.getElementById('canvas1')
+        console.log(canvas1)
+
+        const ctx1 = canvas1.getContext("2d")
+        console.log(ctx1)
+
+        // 三角形を描画
+        ctx1.beginPath()
+        ctx1.moveTo(50, 50)
+        ctx1.lineTo(50, 80)
+        ctx1.lineTo(10, 80)
+        ctx1.closePath()
+        // ctx1.stroke()
+        ctx1.fill()
+
+        /**
+         * bezierCurveTo() : ベジェ曲線
+         * arc() : 円弧
+         * rect() : 長方形
+         * ellipse() : 楕円
+         * clearRect() : 領域のクリア
+         * fillRect() : 塗りつぶし矩形
+         * strokeRect() : 矩形描画
+         */
+        ctx1.beginPath()
+        ctx1.moveTo(55, 80)
+        ctx1.arc(125, 80, 70, Math.PI, 0, true)
+        ctx1.bezierCurveTo(170, 100, 120, -50, 55, 50)
+        ctx1.closePath()
+        ctx1.moveTo(105, 50)
+        ctx1.ellipse(85, 50, 20, 15, 0, 0, 2 * Math.PI)
+        ctx1.moveTo(90, 50)
+        ctx1.arc(80, 50, 10, 0, 2 * Math.PI)
+        ctx1.rect(10, 85, 40, 5)
+        ctx1.fill() 
+        // ctx1.clearRect(0, 0, 200, 200) // 全領域クリア
+
+        /* 描画のスタイル */
+        /** 最も近いctx.beginPath()のスコープに適用される.
+         * fillStyle : 塗りつぶし色, グラデーション, パターン
+         * strokeStyle : 縁の色, 
+         * lineWidth : 線幅
+         */
+        ctx1.fillStyle = "blue"
+        ctx1.strokeStyle = "red"
+        ctx1.lineWidth = 3
+        ctx1.fill()
+        ctx1.stroke()
+    </script>
+
+    <script type="module" defer>
+        const canvas2 = document.getElementById('canvas2')
+        const ctx2 = canvas2.getContext('2d')
+
+        /* 画像を表示する */
+        const img = document.getElementById('image')
+        img.addEventListener("load", e => console.log(`Image Size: ${img.naturalWidth}-${img.naturalHeight}`))
+        console.log(img)
+
+        for (let i = 0; i < 4; i++) {
+            ctx2.drawImage(img, -50*i, -30*i)
+        }
+        ctx2.clearRect(0, 0, 200, 200)
+        for (let i = 0; i < 4; i++) {
+            ctx2.drawImage(img, /*x*/150-50*i, /*y*/100-30*i, /*w*/40, /*h*/70)
+        }
+        ctx2.clearRect(0, 0, 200, 200)
+
+        /*画像から矩形を切り抜いてCanvasに貼り付ける*/
+        ctx2.drawImage(img, /*ox*/100, /*oy*/100, /*ow*/50, /*oh*/90, /*x*/10, /*y*/10, /*w*/180, /*h*/160)
+    </script>
+
+    <script type="module" defer>
+        /*ピクセル操作*/
+        const img3 = document.getElementById('image')
+        const ctx3 = document.getElementById('canvas3').getContext('2d')
+        ctx3.drawImage(img3, /*ox*/512, /*oy*/512, /*ow*/400, /*oh*/400, /*x*/0, /*y*/0, /*w*/200, /*h*/200)
+        let imageData = ctx3.getImageData(0, 0, 200, 200)
+        console.log(imageData)
+        let [r,g,b,a] = imageData.data
+        console.log([r,g,b,a])
+
+        let width = 200
+        let height = 200
+        let rgba = 4
+        let row = height/2 + 10
+        let offsetX = 100
+        let base = width * rgba * row + (width - offsetX) * rgba
+        r = imageData.data[base + 0]
+        g = imageData.data[base + 1]
+        b = imageData.data[base + 2]
+        a = imageData.data[base + 3]
+        console.log([r,g,b,a])
+
+        console.log(ctx3.getImageData(0,0,1,1)) // 指定位置の1ピクセルデータ(rgba)
+
+        // ピクセルの編集
+        for (let y = 0; y < 200; y++) {
+            for (let w = 0, x = y; w < 20 && x < 200; w++, x++) {
+                // (r,g,b,a) = (255,0,0,255) 🟥
+                imageData.data[y * 200 * rgba + x * rgba + 0] = 255
+                imageData.data[y * 200 * rgba + x * rgba + 1] = 0
+                imageData.data[y * 200 * rgba + x * rgba + 2] = 0
+                imageData.data[y * 200 * rgba + x * rgba + 3] = 255
+            }
+        }
+        ctx3.putImageData(imageData, 0, 0)
+
+        // ctx3.clearRect(0,0,200,200)
+        // ctx3.drawImage(img3, /*ox*/512, /*oy*/512, /*ow*/400, /*oh*/400, /*x*/0, /*y*/0, /*w*/200, /*h*/200)
+        // imageData = ctx3.getImageData(0, 0, 200, 200)
+
+        const mx = 10, my = 10
+        for (let y = 0; y < width; y+=my) {
+            for (let x = 0; x < width; x+=mx) {
+                const r = imageData.data[y * width * rgba + x * rgba + 0]
+                const g = imageData.data[y * width * rgba + x * rgba + 1]
+                const b = imageData.data[y * width * rgba + x * rgba + 2]
+                const a = imageData.data[y * width * rgba + x * rgba + 3]
+                for (let dy = 0; dy < my; dy++) {
+                    for (let dx = 0; dx < mx; dx++) {
+                        imageData.data[(y+dy) * width * rgba + (x+dx) * rgba + 0] = r
+                        imageData.data[(y+dy) * width * rgba + (x+dx) * rgba + 1] = g
+                        imageData.data[(y+dy) * width * rgba + (x+dx) * rgba + 2] = b
+                        imageData.data[(y+dy) * width * rgba + (x+dx) * rgba + 3] = a
+                    }
+                }
+            }
+            
+        }
+        ctx3.putImageData(imageData, 0, 0)
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        const canvas4 = document.getElementById('canvas4')
+
+        // ダブルバッファリング用コンテキスト
+        const ctx4 = canvas4.getContext("bitmaprenderer") // ImageBitmapRenderingContextオブジェクト
+
+        /**
+         * ImageBitmapRenderringContextオブジェクトには
+         * transferFromImageBitmap()メソッドしか存在しないので、描画メソッドが使えない.
+         * 描画はOffscreenCanvasのコンテキストを使う.
+         * 
+         * OffscreenCanvasのコンテキストを使って描画
+         * ↓
+         * transferFromImageBitmap()を使って, ダブルバッファリング
+         */
+        let offscreen = new OffscreenCanvas(canvas4.width, canvas4.height)
+        const offscreenCtx = offscreen.getContext('2d')
+        offscreenCtx.moveTo(105, 50)
+        offscreenCtx.ellipse(85, 50, 20, 15, 0, 0, 2 * Math.PI)
+        offscreenCtx.fill()
+
+        let bitmap = offscreen.transferToImageBitmap()
+        ctx4.transferFromImageBitmap(bitmap)
+
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        const canvas5 = document.getElementById('canvas5')
+        const gl = canvas5.getContext('webgl')
+
+        let vertices = [
+            -.5, .5, 0,
+            -.5, -.5, 0,
+            .5, -.5, 0
+        ]
+        let vertexBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
+        gl.bindBuffer(gl.ARRAY_BUFFER, null)
+
+        // バーテックスシェーダ
+        let vertexCode = `
+            attribute vec3 coordinates;
+            void main(void)
+            {
+              gl_Position = vec4(coordinates, 1.);
+            }
+        `
+        let vertexShader = gl.createShader(gl.VERTEX_SHADER)
+        gl.shaderSource(vertexShader, vertexCode)
+        gl.compileShader(vertexShader)
+
+        // フラグメントシェーダ
+        let fragmentCode = `
+            void main(void)
+            {
+                gl_FragColor = vec4(1., 1., 1., 1.);
+            }
+        `
+        let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
+        gl.shaderSource(fragmentShader, fragmentCode)
+        gl.compileShader(fragmentShader)
+
+        // シェーダプログラム作成
+        let shaderProgram = gl.createProgram()
+        gl.attachShader(shaderProgram, vertexShader)
+        gl.attachShader(shaderProgram, fragmentShader)
+        gl.linkProgram(shaderProgram)
+        gl.useProgram(shaderProgram)
+
+        // 頂点バッファとシェーダプログラム内のcorrdinates変数に紐づける
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+        let coordinates = gl.getAttribLocation(shaderProgram, "coordinates")
+        gl.vertexAttribPointer(coordinates, 3, gl.FLOAT, false, 0, 0)
+        gl.enableVertexAttribArray(coordinates) // 紐付け
+
+        // 描画の実行
+        gl.clearColor(0., 0., 0., 1.)
+        gl.enable(gl.DEPTH_TEST)
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.viewport(0, 0, canvas5.width, canvas5.height)
+        gl.drawArrays(gl.TRIANGLES, 0, 3) // ドローコール. gl.drawElements()なども
+
+
+
+    </script>
+</body>
+
