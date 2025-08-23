@@ -57,6 +57,10 @@
                 <div>canvas5(WEBGL)</div>
                 <canvas id="canvas5" width="200" height="200"></canvas>
             </div>
+            <div>
+                <div>canvas6(Analyser frequency of audio)</div>
+                <canvas id="canvas6" width="200" height="200"></canvas>
+            </div>
         </div>
     </main>
 
@@ -315,8 +319,148 @@
         gl.viewport(0, 0, canvas5.width, canvas5.height)
         gl.drawArrays(gl.TRIANGLES, 0, 3) // ドローコール. gl.drawElements()なども
 
+    </script>
+
+    <script type="module" defer>
+
+        /* 音声の読み込みと再生 */
+        // let soundBuffer
+        // let audioContext = new AudioContext()
+        // fetch("./brook1.mp3").then(res => {
+        //     console.log("res", res)
+        //     return res.arrayBuffer()
+        // }).then(buffer => {
+        //     const decodedAudioData1 = audioContext.decodeAudioData(buffer)
+        //     console.log("decodedAudioData1", decodedAudioData1)
+        //     return decodedAudioData1
+        // }).then(buffer => {
+        //     console.log("buffer", buffer)
+        //     soundBuffer = buffer
+        //     const source = audioContext.createBufferSource()
+        //     console.log("source", source)
+        //     source.buffer = buffer
+        //     source.connect(audioContext.destination)
+        //     source.start(0)
+        //     console.log("Start audio")
+        // })
+        // console.log("soundBuffer", soundBuffer)
+
+        /* 音にフィルタをかける */
+        // fetch("./brook1.mp3").then(res => {
+        //     return res.arrayBuffer()
+        // }).then(buffer => {
+        //     return audioContext.decodeAudioData(buffer)
+        // }).then(buffer => {
+        //     const source = audioContext.createBufferSource()
+        //     source.buffer = buffer
+            
+        //     // ローパスフィルタ
+        //     let filter = audioContext.createBiquadFilter()
+        //     filter.type = "lowpass"
+        //     filter.frequency.value = 500 // 500Hz
+        //     source.connect(filter).connect(audioContext.destination)
+        //     source.start(0)
+        // })
+
+
+        /* 音を重ね合わせる */
+        // let cricketBuffer
+        // fetch("./cricket.mp3").then(res => {
+        //     return res.arrayBuffer()
+        // }).then(buffer => {
+        //     return audioContext.decodeAudioData(buffer)
+        // }).then(buffer => {
+        //     cricketBuffer = buffer
+        //     const cricketSource = audioContext.createBufferSource()
+        //     cricketSource.buffer = buffer
+        //     cricketSource.connect(audioContext.destination)
+        //     cricketSource.start(audioContext.currentTime + 5, 0, 10)
+
+        //     console.log("soundBuffer in then", soundBuffer)
+        //     console.log("buffer in then", buffer)
+        //     const riverSource = audioContext.createBufferSource()
+        //     riverSource.buffer = soundBuffer
+        //     riverSource.connect(audioContext.destination)
+        //     riverSource.start(audioContext.currentTime)
+        // })
+    </script>
+
+    <!-- <script type="module" defer>
+        'use strict'
+
+        /*音を合成する*/
+        let startPureToneNode = (ctx, startTime, baseFreq, factor) => {
+            const oscillatorNode = ctx.createOscillator()
+            oscillatorNode.type = "sine" // square, triangle, etc...
+            oscillatorNode.frequency.value = baseFreq * factor
+
+            const gainNode = ctx.createGain()
+            gainNode.gain.value = Math.floor(1 / factor)
+
+            oscillatorNode.connect(gainNode)
+            oscillatorNode.connect(audioContext.destination)
+            oscillatorNode.start(startTime)
+        }
+
+        let audioContext = new AudioContext()
+        let freq = 200
+        let startTime = audioContext.currentTime + 1
+        startPureToneNode(audioContext, startTime, freq, 1)
+        startPureToneNode(audioContext, startTime, freq, 3)
+        startPureToneNode(audioContext, startTime, freq, 5)
+        startPureToneNode(audioContext, startTime, freq, 7)
+        
+    </script> -->
+
+    <script type="module" defer>
+        /* 周波数分析 */
+
+        'use strict'
+        let audioContext = new AudioContext()
+        let analyser = audioContext.createAnalyser()
+        analyser.fftSize = 256
+        let source = audioContext.createBufferSource()
+        let soundBuffer = (async () => {
+            const res = await fetch("./cricket.mp3")
+            const bufArr = await res.arrayBuffer()
+            console.log("Get ./cricket.mp3")
+            return audioContext.decodeAudioData(bufArr)
+        })()
+        console.log("soundBuffer", soundBuffer)
+        source.buffer = await soundBuffer
+        console.log("source.buffer", source.buffer)
+        source.connect(analyser).connect(audioContext.destination)
+
+        let bufferLength = analyser.frequencyBinCount
+        let dataArray = new Uint8Array(bufferLength)
+        let freqHeight = 200
+        let ctx = document.getElementById('canvas6').getContext("2d")
+        let freqImgData = ctx.getImageData(0,0,bufferLength,freqHeight)
+
+        let count = 0
+        let draw = () => {
+            analyser.getByteFrequencyData(dataArray)
+            for (let i = 0; i < dataArray.length; i++) {
+                // i: 基本周波数の計数, dataArray[i]: 振幅
+                freqImgData.data[4 * (128 * count + i) + 0] = dataArray[i]
+                freqImgData.data[4 * (128 * count + i) + 1] = dataArray[i]
+                freqImgData.data[4 * (128 * count + i) + 2] = dataArray[i]
+                freqImgData.data[4 * (128 * count + i) + 3] = 255
+            }
+            if (count < freqHeight) {
+                count++
+                requestAnimationFrame(draw)
+            } else {
+                ctx.putImageData(freqImgData, 0, 0)
+            }
+        }
+
+        source.start(0, 0, 10)
+        draw()
 
 
     </script>
+
+    
 </body>
 
