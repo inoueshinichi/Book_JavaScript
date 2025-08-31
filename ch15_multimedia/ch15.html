@@ -61,6 +61,10 @@
                 <div>canvas6(Analyser frequency of audio)</div>
                 <canvas id="canvas6" width="200" height="200"></canvas>
             </div>
+            <div>
+                <div>canvas7(Specified 3 WEB API)</div>
+                <canvas id="canvas7" width="200" height="200"></canvas>
+            </div>
         </div>
     </main>
 
@@ -457,10 +461,79 @@
 
         source.start(0, 0, 10)
         draw()
-
-
     </script>
 
+    <script type="module" defer>
+        'use strict'
+
+        // 定期的に処理を繰り返す
+        // 基本60FPS. ただし前後する(ブラウザの都合の良いタイミングで実行)
+        // Webブラウザ自身の画面描画と実行タイミングが揃えられる
+        // たぶが非表示の場合は呼び出し頻度が下がる
+        let baseTime = performance.now()
+        let prevTime = baseTime
+        let animate = () => {
+            const now = performance.now()
+            console.log(`${now - prevTime}[ms]`) // [ms]
+            prevTime = now
+            if ((now - baseTime) < 5000) window.requestAnimationFrame(animate)
+        }
+        // animate()
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        // フルスクリーンでアプリケーションを利用する
+        // Fullscreen API
+        // 全体画面で表示させたい要素のrequestFullscreen()メソッドを呼び出す
+        
+        const img_ = document.getElementById('image')
+        console.log(img_)
+
+        // Promiseを使う場合
+        // img_.requestFullscreen().then(() => {
+        //     console.log("done requestFullscreen()")
+        //     setTimeout(() => document.exitFullscreen(), 5000)
+        // })
+
+        // addEventListnerを使う場合
+        img_.addEventListener("fullscreenchange", () => {
+            if (document.fullscreenElement) {
+                setTimeout(() => document.exitFullscreen(), 5000)
+            } else {
+                console.log("Invalid document.fullscreenElement")
+            }
+        })
+        img_.requestFullscreen()
+        
+    </script>
+
+    <script type="module" defer>
+        "use strict"
+
+        // Pointer Lock API
+        // マウスポインターをロックする & 非表示
+        // マウスポインターの値は更新される
+        console.log("[Start] Mouse Pointer Lock API")
+
+        document.addEventListener("pointerlockchange", () => {
+            const mousemoveHandler = (e) => {
+                console.log(`movement:${e.movementX},${e.movementY} / client: ${e.clientX},${e.clientY}`)
+            }
+
+            if (document.pointerLockElement) {
+                document.body.addEventListener("mousemove", mousemoveHandler)
+            } else {
+                document.body.removeEventListener("mousemove", mousemoveHandler)
+            }
+
+            setTimeout(() => document.exitPointerLock(), 5000)
+            console.log("[Exit] Mouse Pointer Lock API")
+        }, false)
+        document.body.requestPointerLock()
+
+    </script>
     
 </body>
 

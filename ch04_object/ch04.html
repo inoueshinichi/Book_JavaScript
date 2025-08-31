@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- 文字セット -->
+  <meta charset="UTF-8">
+
+  <!-- レイアウト -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Webページの説明 -->
+  <title>Web</title>
+  <meta name="description" content="Webページの説明">
+  <meta name="keywords" content="キーワード">
+
+  <!-- OGP設定 -->
+  <meta property="og:local" content="ja_JP" />
+  <meta property="og:type" content="ウェブサイト名" />
+  <meta property="og:title" content="" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="" />
+  <meta property="og:site_name" content="" />
+  <meta property="og:image" content="" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <header>
+        <nav>Ch04 Object (Header)</nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div>
+                Objectクラス
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <nav>Ch04 Object (footer)</nav>
+    </footer>
+
+    <script type="module" defer>
+        'use strict'
+
+        // JSのオブジェクト
+        let vector2 = {
+            x:3,
+            y:4,
+            lengthSq: self => self.x * self.x + self.y * self.y,
+            add: (self, other) => {
+                self.x += other.x
+                self.y += other.y
+            }
+        }
+        console.log("vector2.lengthSq(vector2)", vector2.lengthSq(vector2))
+
+        const Vector2_ = (x, y) => {
+            return {
+                x, y,
+                lengthSq: self => self.x * self.x + self.y * self.y,
+                add: (self, other) => {
+                    self.x += other.x
+                    self.y += other.y
+                }
+            }
+        }
+        const vector2a = Vector2_(20,22)
+        console.log("vector2a", vector2a)
+        const vector2b = Vector2_(22,20)
+        console.log("vector2b", vector2b)
+        console.log("add:", vector2a.add(vector2a, vector2b))
+        console.log(vector2a)
+
+        const Vector3_lengthSq = self => self.parent.lengthSq(self) + self.z * self.z
+        const Vector3_add = (self, other) => {
+            self.parent.add(self, other)
+            self.z += other.z
+        }
+        
+        const Vector3_ = (x,y,z) => {
+            let parent = Vector2_(x,y)
+            return {
+                parent,
+                ...parent,
+                z,
+                lengthSq: Vector3_lengthSq,
+                add: Vector3_add
+            }
+        }
+        const vector3a = Vector3_(1,4,5)
+        console.log("vector3a", vector3a)
+        console.log(vector3a.lengthSq(vector3a))
+
+        const vector3b = Vector3_(41,38,37)
+        vector3a.add(vector3a, vector3b)
+        console.log("vector3a", vector3a)
+    </script>
+
+    <script type="module" defer>
+        "use strict"
+
+        // 関数から自身が所属するオブジェクトにアクセスする
+        const Vector2_lengthSq = function() {
+            return this.x * this.x + this.y * this.y
+        }
+        const Vector2__ = (x,y) => {
+            return { 
+                x:x, 
+                y:y, 
+                lengthSq: Vector2_lengthSq
+            }
+        }
+        const v2_ = Vector2__(3,4)
+        console.log("v2_", v2_)
+        console.log("v2_.lengthSq()", v2_.lengthSq())
+
+        // console.log("Vector2_lengthSq()", Vector2_lengthSq())
+
+        class Vector2 {
+            static instanceCount = 0
+
+            static incrementCount() {
+                this.instanceCount++
+            }
+
+            constructor(x,y) {
+                this.x = x
+                this.y = y
+                Vector2.incrementCount()
+            }
+
+            lengthSq() {
+                return this.x * this.x + this.y * this.y
+            }
+
+            add(that) {
+                this.x += that.x
+                this.y += that.y
+            }
+
+            // ゲッター
+            get length() {
+                return Math.sqrt(this.lengthSq())
+            }
+
+            // セッター
+            set length(len) {
+                const ratio = len / this.length
+                this.x *= ratio
+                this.y *= ratio
+            }
+        }
+        const v2 = new Vector2(9, 1)
+        console.log("v2", v2)
+        v2.add(v2_)
+        console.log("v2 + v2_", v2)
+        console.log("v2.length", v2.length)
+        v2.length = 50
+        console.log("v2.length", v2.length)
+        console.log("v2", v2)
+
+        new Vector2(1,1)
+        console.log("Vector2.instanceCount", Vector2.instanceCount)
+
+        // 関数式
+        const Vector3 = class extends Vector2 {
+            constructor(x,y,z) {
+                super(x,y)
+                this.z = z
+            }
+        }
+        const v3 = new Vector3(1,2,3)
+        console.log("v3", v3)
+        console.log("Vector2.instanceCount", Vector2.instanceCount)
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        let tusk = {
+            act1() {
+                console.log("chunchun")
+            }
+        }
+        tusk.act1()
+
+        let tusk1 = {
+            cry: "chunchun",
+
+            act1() {
+                console.log(this.cry)
+            },
+
+            act2() {
+                this.act1()
+                console.log("bird")
+            },
+
+            get humming() {
+                return "humming bird"
+            }
+        }
+        tusk1.act2()
+        console.log(tusk1.humming)
+
+        // 継承
+        let tusk2 = {
+            __proto__: tusk1, // 継承
+
+            act2() {
+                super.act1()
+                console.log("black crow bird")
+            }
+        }
+        console.log(tusk2.act2())
+    </script>
+
+    <script type="module" defer>
+        'use strict'
+
+        // Objectクラス(最上位)
+
+        // hasOwnProperty(): オブジェクト自身のプロパティか否かを判定する
+        console.log([].hasOwnProperty("hasOwnProperty"))
+        console.log([].hasOwnProperty("length"))
+        console.log("---配列のインデックスは実はプロパティ---")
+        console.log([].hasOwnProperty('0'))
+        console.log([42].hasOwnProperty('0'))
+
+        // あるプロパティが"for-in文"で現れるかどうかは、propertyIsEnumerable()メソッドで確認できる
+        const a = [42]
+        console.log(a)
+        console.log(a.propertyIsEnumerable('0'))
+        console.log(a.propertyIsEnumerable("length"))
+
+        // 文字列に変換する
+        // toString()
+        // toLocaleString() : ロケール対応
+        console.log(({a:1,b:2}).toString())
+        console.log(({a:1,b:2}).toLocaleString())
+
+        // Dateクラス・・・toString()とtoLocaleString()の出力が異なる
+        const date = new Date(Date.UTC(2019,0))
+        console.log(date)
+        console.log(date.toString())
+        console.log(date.toLocaleDateString("ja-JP", {timeZone:"UTC"}))
+        console.log(date.toLocaleString("en-US", {timeZone:"UTC"}))
+
+        /* Objectクラス経由で利用する機能 */
+        console.log(Object()) // オブジェクト生成
+        console.log(new Object()) // 
+        console.log({})
+        
+        // Object.fromEtries() : 単純な設定のプロパティを持つオブジェクトを生成する
+        // <-> .entries()
+        let tmp = Object.fromEntries([["x", 3], ["y", 4]])
+        console.log(tmp)
+
+        // Object.create()は, 使用するプロトタイプとプロパティを指定してオブジェクトを生成できる
+        // Object.create()は, プロパティ記述子を指定してプロパティを指定できる
+        // プロパティ記述子
+        // | 項目名 | デフォルト | 説明 |
+        // enumerable : false : trueならfor-inなどによる列挙の対象になる
+        // configurable : false : trueならプロパティを削除したり記述子を変更できる
+        // writable : false : trueならプロパティに値を代入できる
+        // value : undefined : 値
+        // get : undefined : ゲッター
+        // set : undefined : セッター
+        const vec = Object.create(Object.prototype, {
+            x: {
+                value: 3,
+                writable: true,
+                enumerable: true,
+            },
+            y: {
+                value: 4,
+                writable: true,
+                enumerable: true,
+            },
+            length: {
+                enumerable: false,
+                get: function() {
+                    return Math.sqrt(this.x*this.x+this.y*this.y)
+                },
+                set: function(len) {
+                    const current = this.length
+                    this.x *= len / current
+                    this.y *= len / current
+                }
+            }
+        })
+        console.log(`vec:`)
+        console.log(vec)
+        // 継承したいオブジェクトがなければ、第一引数のオブジェクトのプロトタイプは
+        // Object.prototypeでOK
+        console.log(`length: ${vec.length}`)
+        vec.length = 50
+        console.log(`length: ${vec.length}`)
+        console.log(vec)
+
+        // オブジェクトの拡張性に関わる4状態
+        // | 状態 | プロパティ追加 | プロパティ更新 | プロパティ削除 | プロパティ設定変更 |
+        // 拡張可能(Extensible) : ⚪︎ : - : - : - :
+        // 拡張不可             : x : - : - : - :
+        // 凍結(Frozen)        : x : x : x : x :
+        // 封印(Sealed)        : x : - : x : x :
+
+        // プロパティの更新、削除、設定変更については基本的にプロパティ記述子による
+        // 指定に従うが、凍結もしくは封印されると禁止される場合がある.
+        // デフォルト状態は拡張可能. 下記関数で設定変更可能
+        // Object.preventExtentions() : 拡張不可にする. 一度変更すると解除手段はない
+        // Object.freeze() : 凍結する
+        // Object.seal() : 封印する
+        
+        // 状態チェック
+        // Object.isExtensible()
+        // Object.isFrozen()
+        // Object.isSealed()
+
+        const checkStatus = (obj) => `拡張：${Object.isExtensible(obj)}
+            凍結:${Object.isFrozen(obj)}
+            封印:${Object.isSealed(obj)}`
+        
+        console.log("checkStatus({answer:42})")
+        console.log(checkStatus({answer:42}))
+        console.log("checkStatus(Object.preventExtensions({answer:42}))")
+        console.log(checkStatus(Object.preventExtensions({answer:42})))
+        console.log("checkStatus(Object.seal({answer:42}))")
+        console.log(checkStatus(Object.seal({answer:42})))
+        console.log("checkStatus(Object.freeze({answer:42}))")
+        console.log(checkStatus(Object.freeze({answer:42})))
+
+        // プロパティを一覧する
+        // Objectクラスには引数として与えられたオブジェクトから直接プロパティを
+        // 一覧するメソッドがある
+
+        // Object.getOwnPropertyNames() : キーが文字列の直接のプロパティ名を配列で返す
+        // Object.getOwnPropertySymbols() : キーがシンボルの直接のプロパティ名を配列で返す
+        // Object.keys() : 直接のプロパティの名前の配列を返す
+        // Object.values() : 直接のプロパティの値の配列を返す
+        // Object.entries() : 直接のプロパティの名前と値を要素として持つ配列からなる二重配列を返す
+        let obj = {bro1: "Mycroft", bro2: "Sherlock", [Symbol('sys')]: "Eurus"}
+        console.log(obj)
+        tmp = Object.getOwnPropertyNames(obj)
+        console.log(tmp)
+        tmp = Object.getOwnPropertySymbols(obj)
+        console.log(tmp)
+        tmp = Object.keys(obj)
+        console.log(tmp)
+        tmp = Object.values(obj)
+        console.log(tmp)
+        tmp = Object.entries(obj)
+        console.log(tmp)
+
+        // Object.entries()メソッドの返す二重配列は, Object.fromEntries()の引数として
+        // 与えることができる. これらを利用してオブジェクトをコピーできる.
+        let clone = Object.fromEntries(Object.entries(obj))
+        console.log("clone")
+        console.log(clone) // Symbolはコピー不可
+
+        // プロパティを管理する
+        // プロパティ記述子を後から更新する方法
+        // Object.defineProperties() : プロパティ名をキー, プロパティ記述子を値(kv)で更新
+        // Object.defineProperty() : プロパティ名とプロパティ記述子を引数に与えて更新
+        // Object.getOwnPropertydescriptor() : 直接のプロパティのプロパティ記述子を返す
+        // Object.getOwnPropertyDescriptors() : 全ての直接のプロパティのプロパティ記述子を返す
+
+        let v = {}
+        console.log(v)
+        Object.defineProperties(v, {
+            x: {value: 3, writable: true, enumerable: true, configurable: true},
+            y: {value: 4, writable: true, enumerable: true},
+        })
+        console.log(v)
+        Object.defineProperty(v, "length", {
+            enumerable: false,
+            get: function() {
+                return Math.sqrt(this.x*this.x + this.y*this.y)
+            },
+            set: function(len) {
+                const current = this.length
+                this.x *= len / current
+                this.y *= len / current
+            }
+        })
+        console.log(v)
+        console.log(Object.getOwnPropertyDescriptors(v))
+        console.log(Object.getOwnPropertyDescriptor(v, "length"))
+
+
+        obj = {x:4, y:3}
+        console.log(obj)
+
+        Object.defineProperty(v, "x", {value: 5, writable: true, enumerable: false})
+        console.log(v)
+
+        // 設定変更(configurable)が許可されていないプロパティを変更しようとするとエラー
+        // Object.defineProperty(v, "y", {value: 5, writable: true, enumerable: false})
+
+        // アクセサプロパティを値プロパティに変更はできない
+        // Object.defineProperty(v, "length", {value:5, writable: true, enumerable: true})
+
+        // オブジェクトが拡張可能ならドット記法で新しいプロパティを追加できるが、
+        // Object.create()やObject.defineProperty()で指定したプロパティ記述子とは異なる
+        v.z = 1
+        console.log(Object.getOwnPropertyDescriptors(v))
+
+        
+        // プロパティのコピー
+        // Object.assign()を使用すると第二引数以降のオブジェクト自身のプロパティを取り出して第一引数のオブジェクtに設定できる
+        let parameters = {power: "B", speed: "C"}, params1 = {range: "D"}, params2 = {durability: "C"}
+        console.log(parameters)
+        console.log(params1)
+        console.log(params2)
+        Object.assign(parameters, params1, params2)
+        console.log(parameters)
+
+        // クローン, Object.assign()の場合, Object.fromEntries(Object.entries())と異なり、Symbolやゲッター、セッターもコピーされる
+        clone = Object.assign({}, parameters) // symbolもコピーされてしまう。。
+        console.log("clone")
+        console.log(clone)
+        console.log(clone === parameters)
+
+        let params3 = {
+            [Symbol("precision")]: "D",
+            get development() { return "C" }
+        }
+        console.log("params3")
+        console.log(params3)
+        Object.assign(parameters, params3)
+        console.log('parameters')
+        console.log(parameters)
+
+        // オブジェクトの同一性
+        console.log(Object.is(+0, -0)) // false
+        console.log(+0 === -0) // true
+        console.log(Object.is(NaN, NaN)) // true
+        console.log(NaN === NaN) // false
+
+        // オブジェクトのクラスを確認
+        class Vector4 {}
+        v = new Vector4()
+        console.log(v)
+        console.log(typeof v)
+
+        // instanceof
+        // console.log(v instanceof Vector2) // false
+        // console.log(v instanceof Vector3) // false
+        console.log(v instanceof Vector4) // true
+        console.log(v instanceof Object) // true
+        console.log(v instanceof Date) // false
+
+        // 全く見当のつかないオブジェクトのクラスを調べる必要がある場合
+        // Object.getPrototypeOf()を使う
+        console.log(Object.getPrototypeOf(v))
+
+
+
+        
+    </script>
+</body>
