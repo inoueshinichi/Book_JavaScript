@@ -45,7 +45,91 @@
 
     <script type="module" defer>
         "use strict"
-        
+        // プリミティブ型
+        // Boolean
+        // Number
+        // BigInt
+        // String
+        // Symbol
+        // ---
+        // Function
+        // RegExp
+        // Object
+        // Array
+        // globalThis
+        // Null
+        // Undefined
+
+        // globalThis
+        console.log(globalThis)
+
+        // 暗黙的なボックス化
+        console.log(42n.toString())
+        console.log(true.toString())
+
+        // 明示的なボックス化
+        console.log(Object(true))
+        console.log(new Object(false))
+        console.log(Object(42))
+        console.log(new Object(42))
+
+        // Object -> プリミティブ型　：　逆変換
+        console.log(Object(true).valueOf()) // true
+        console.log(Object(42).valueOf()) // 42
+
+        console.log("プリミティブに変換")
+
+        console.log(Boolean(1)) // true
+
+        // falsy
+        console.log(Boolean(0)) // false
+        console.log(Boolean(undefined)) // false
+        console.log(Boolean(null)) // false
+
+        // -> Number
+        console.log(Number(Object(42))) // 42
+        console.log(Number(true)) // 1
+        console.log(Number(undefined)) // NaN
+        console.log(Number(null)) // 0
+        console.log(Number("51")) // 51
+        console.log(Number("4e2")) // 400
+        console.log(Number("42n")) // NaN
+
+        /* Booleanオブジェクト */
+
+        // オブジェクトとしてのBooleanをプリミティブの真偽値のように使用すると
+        // 全てtrueと判断してしまう。。。
+        const falseObject = new Boolean(false)
+        console.log(falseObject)
+        console.log("falseObject ? 'true' : 'false'", falseObject ? "true" : "false")
+
+        // Javascriptで偽としてみなされる値
+        // false
+        // null
+        // undefined
+        // 0
+        // 0n
+        // 空もじ
+        // NaN
+        // だけ！
+
+        /* Numberオブジェクト */
+        console.log(new Number(54)) // Number {}
+        console.log(+new Number(54)) // 54
+        console.log(new Number(6) * new Number(9)) // 54
+
+        console.log(Number.MAX_VALUE)
+        console.log(Number.MAX_VALUE + 1) // 増えない
+        console.log(Number.MAX_VALUE + Number.MAX_VALUE) // Infinity
+
+        console.log(Number.MIN_VALUE)
+        console.log(Number.MIN_VALUE - 1) // -1
+        console.log(Number.MAX_VALUE / 1.9) // 変わらない
+        console.log(Number.MIN_VALUE / 2) // 0
+
+
+
+
     </script>
 
 </body>
