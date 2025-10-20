@@ -16,6 +16,7 @@ import {
 
 import { AppLayout } from "./components/AppLayout";
 import { TaskList } from "./components/TaskList";
+import { TrashedTaskList } from "./components/TrashedTaskList";
 
 function App() {
   const scaffold = createBrowserRouter([
@@ -28,7 +29,7 @@ function App() {
       children: createRoutesFromElements(
         <>
           <Route path="/" element={<TaskList />} />
-          <Route path="/trash" element={<div>ゴミ箱</div>} />
+          <Route path="/trash" element={<TrashedTaskList />} />
         </>,
       ),
     },
